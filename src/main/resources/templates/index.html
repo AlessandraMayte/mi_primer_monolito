@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinaria Gatuna</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+    <link th:href="@{/styles.css}" rel="stylesheet">
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="fas fa-cat"></i> Veterinaria Gatuna</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#"><i class="fas fa-home"></i> Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-stethoscope"></i> Servicios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-user-md"></i> Veterinarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-phone"></i> Contacto</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="main-content">
+        <div class="section-header">
+            <div class="px-5">
+                <div class="px-5">
+                    <div class="px-5">
+                        <div class="px-5">
+                            <div class="px-5">
+                <h2 class="section-title px-5"><i class="fas fa-paw"></i> Nuestros Clientes Felinos</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-success add-owner-btn" data-bs-toggle="modal" data-bs-target="#addOwnerModal" title="Agregar Nuevo Propietario">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 col-lg-4 d-flex align-items-stretch" th:each="propietario, iStat : ${propietarios}">
+                <div class="owner-card"
+                     data-bs-toggle="modal"
+                     data-bs-target="#editOwnerModal"
+                     th:data-owner-id="${propietario.id}"
+                     th:data-owner-nombre="${propietario.nombre}"
+                     th:data-owner-apellido="${propietario.apellido}"
+                     th:data-owner-telefono="${propietario.telefono}"
+                     th:data-owner-direccion="${propietario.direccion}">
+
+                    <div class="owner-header">
+                        <div class="owner-name"><i class="fas fa-user"></i> <span th:text="${propietario.nombre + ' ' + propietario.apellido}">Nombre Completo</span></div>
+                        <div class="owner-phone"><i class="fas fa-phone"></i> Teléfono: <span th:text="${propietario.telefono}">999-888-777</span></div>
+                    </div>
+                    <div class="pets-container">
+                        <div class="pet-item"
+                             th:each="gato, gStat : ${propietario.gatos}"
+                             data-bs-toggle="modal"
+                             data-bs-target="#editPetModal"
+                             th:data-pet-id="${gato.id}"
+                             th:data-pet-nombre="${gato.nombre}"
+                             th:data-pet-raza="${gato.raza}"
+                             th:data-pet-edad="${gato.edad}"
+                             th:data-pet-propietario-id="${propietario.id}">
+
+                            <div class="pet-avatar" th:classappend="'color-' + (${gStat.index % 5} + 1)">
+                                <i class="fas fa-cat"></i>
+                            </div>
+                            <div class="pet-info">
+                                <div class="pet-name" th:text="${gato.nombre}">Nombre Gato</div>
+                                <div class="pet-breed" th:text="${gato.raza}">Raza Gato</div>
+                            </div>
+                        </div>
+                        <div th:if="${propietario.gatos == null or propietario.gatos.isEmpty()}" class="col-12 text-center text-muted mt-3">
+                            <p><i class="fas fa-info-circle"></i> Este propietario aún no tiene mascotas registradas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${propietarios == null or propietarios.isEmpty()}" class="col-12 text-center text-muted">
+                <p><i class="fas fa-exclamation-triangle"></i> No hay propietarios registrados aún.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOwnerModalLabel">Editar Propietario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOwnerForm">
+                    <input type="hidden" id="ownerId" name="id">
+                    <div class="mb-3">
+                        <label for="ownerNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="ownerNombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerApellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="ownerApellido" name="apellido" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerTelefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="ownerTelefono" name="telefono">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerDireccion" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="ownerDireccion" name="direccion">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger me-auto" id="deleteOwnerButton">
+                    <i class="fas fa-trash-alt"></i> Eliminar Propietario
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="saveOwnerChanges">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editPetModal" tabindex="-1" aria-labelledby="editPetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPetModalLabel">Editar Gato</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPetForm">
+                    <input type="hidden" id="petId" name="id">
+                    <input type="hidden" id="petOwnerId" name="propietarioId">
+                    <div class="mb-3">
+                        <label for="petNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="petNombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="petRaza" class="form-label">Raza</label>
+                        <input type="text" class="form-control" id="petRaza" name="raza">
+                    </div>
+                    <div class="mb-3">
+                        <label for="petEdad" class="form-label">Edad</label>
+                        <input type="number" class="form-control" id="petEdad" name="edad" min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger me-auto" id="deletePetButton">
+                    <i class="fas fa-trash-alt"></i> Eliminar Gato
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="savePetChanges">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addOwnerModal" tabindex="-1" aria-labelledby="addOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOwnerModalLabel">Agregar Nuevo Propietario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addOwnerForm">
+                    <div class="mb-3">
+                        <label for="newOwnerNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="newOwnerNombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newOwnerApellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="newOwnerApellido" name="apellido" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newOwnerTelefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="newOwnerTelefono" name="telefono">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newOwnerDireccion" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="newOwnerDireccion" name="direccion">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="createOwnerButton">Crear Propietario</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p class="mb-0">© 2025 Veterinaria Gatuna - Cuidando a tus felinos con amor <i class="fas fa-heart" style="color: #ff6b6b;"></i></p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/script.js}"></script>
+</body>
+</html>
